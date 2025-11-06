@@ -1,0 +1,48 @@
+name: pip install on macOS
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - '**'
+
+jobs:
+
+  pip-install-and-import:
+    name: pip install on macOS
+    runs-on: macos-11
+
+    steps:
+      - name: checkout arg_needle
+        uses: actions/checkout@v3
+
+      - uses: actions/setup-python@v3
+        with:
+          python-version: 3.x
+
+      - name: install system packages
+        run: |
+          brew install boost zlib gsl
+
+      - name: install python pip dependencies
+        run: |
+          python --version
+          python -m pip install --upgrade pip setuptools wheel
+          python -m pip install cmake ninja
+
+      - name: install Palamara python dependencies
+        run: |
+          python --version
+          python -m pip install asmc-asmc arg-needle-lib 
+
+      - name: install arg_needle
+        run: |
+          python --version
+          python -m pip install .
+
+      - name: test import works as expected
+        run: |
+          python --version
+          python test/test_import.py
