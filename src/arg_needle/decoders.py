@@ -30,7 +30,7 @@ import shutil
 
 # our packages
 from asmc.asmc import DecodingParams, ASMC
-import arg_needle_hashing_pybind as arg_needle_hashing
+from .arg_needle_hashing_pybind import HapData
 from .utils import btime
 
 logging.basicConfig(
@@ -329,7 +329,7 @@ def make_asmc_decoder(
     if use_hashing:
         if verbose:
             logging.info("Making HapData object")
-        hasher = arg_needle_hashing.HapData(
+        hasher = HapData(
             mode, haps_file_root, hash_word_size, mapfile, fill_sites=False)
         logging.info("Hashing data is {} by {}".format(hasher.num_haps, hasher.num_sites))
 
@@ -337,7 +337,7 @@ def make_asmc_decoder(
     if use_hashing and backup_hash_word_size > 0:
         if verbose:
             logging.info("Making backup HapData object")
-        backup_hasher = arg_needle_hashing.HapData(
+        backup_hasher = HapData(
             mode, haps_file_root, backup_hash_word_size,
             map_file_path=mapfile, fill_sites=False)
         logging.info("Backup hashing data is {} by {}".format(hasher.num_haps, hasher.num_sites))

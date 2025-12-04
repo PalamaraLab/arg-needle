@@ -1,5 +1,5 @@
 [build-system]
-requires = ["scikit-build-core>=0.11.6", "pybind11"]
+requires = ["scikit-build-core>=0.11.6", "pybind11", "setuptools"]
 build-backend = "scikit_build_core.build"
 
 [project]
@@ -68,3 +68,10 @@ path = "PyPI_README.md"
 
 [[tool.hatch.metadata.hooks.fancy-pypi-readme.fragments]]
 path = "RELEASE_NOTES.md"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+"arg_needle" = ["resources/*"]
+
