@@ -1,6 +1,14 @@
 # arg-needle
 
 This repository contains arg-needle, which implements the ARG inference algorithms ARG-Needle and ASMC-clust.
+Prebuilt CPython wheels are available for Linux (compatible with glibc ≥ 2.28) and macOS (built on macOS 15 for x86_64 and macOS 14 for arm64).
+
+| Platform \ CPython          | ≤3.8 | 3.9 | 3.10 | 3.11 | 3.12 | 3.13 | 3.14 |
+|-----------------------------|------|-----|------|------|------|------|------|
+| Linux x86_64                | ❌    | ✅   | ✅    | ✅    | ✅    | ✅    | ✅    |
+| Linux aarch64               | ❌    | ✅   | ✅    | ✅    | ✅    | ✅    | ✅    |
+| macOS Intel (x86_64)        | ❌    | ✅   | ✅    | ✅    | ✅    | ✅    | ✅    |
+| macOS Apple Silicon (arm64) | ❌    | ✅   | ✅    | ✅    | ✅    | ✅    | ✅    |
 
 ## Quickstart
 
@@ -11,8 +19,6 @@ The Python module can be installed with:
 ```bash
 pip install arg-needle
 ```
-
-This Python module is currently available on Linux and macOS.
 
 ### Documentation
 

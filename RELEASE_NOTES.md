@@ -1,5 +1,10 @@
 # arg-needle Release Notes
 
+## v1.1.0 (2025-12-04)
+
+- Public source code release: https://github.com/PalamaraLab/arg-needle
+- Python wheels are now available for Linux and macOS on both x86_64 and arm64/AArch64 architectures, for CPython versions 3.9 to 3.14 inclusive.
+
 ## v1.0.3 (2023-08-30)
 
 - ASMC decoders can now take a genetic map file with a specified non-default location.
