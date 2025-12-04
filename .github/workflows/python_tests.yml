@@ -46,7 +46,7 @@ jobs:
       - name: install python bindings
         run: |
           python -m pip install --upgrade pip setuptools wheel
-          python -m pip install .
+          python -m pip install .[dev]
 
       - name: python unit tests
         run: |
