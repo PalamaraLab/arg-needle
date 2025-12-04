@@ -12,17 +12,6 @@ authors = [
 ]
 requires-python = ">=3.9"
 
-dependencies = [
-    'arg-needle-lib>=1.0.0',
-    'asmc-asmc>=1.3.1',
-    'fastcluster',
-    'msprime>=1.0.0',
-    'numpy>=1.17.0',
-    'pandas',
-    'psutil',
-    'tskit>=0.1.5',
-]
-
 classifiers = [
     "Development Status :: 4 - Beta",
     "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
@@ -35,15 +24,21 @@ classifiers = [
     "Programming Language :: Python :: 3.14",
 ]
 
-#[project.optional-dependencies]
-#dev = [
-#    "pytest",
-#    "tszip>=0.2.5",
-#]
-#docs = [
-#    "sphinx",
-#    "sphinx-rtd-theme",
-#]
+dependencies = [
+    'arg-needle-lib>=1.2.0',
+    'asmc-asmc>=1.4.0',
+    'fastcluster',
+    'msprime>=1.3.0',
+    'numpy>=1.17.0',
+    'pandas',
+    'psutil',
+    'tskit>=0.5.8',
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+]
 
 [project.scripts]
 infer_args="arg_needle.scripts.infer_args:main"
@@ -75,3 +70,5 @@ where = ["src"]
 [tool.setuptools.package-data]
 "arg_needle" = ["resources/*"]
 
+[tool.pytest.ini_options]
+testpaths = ["test"]

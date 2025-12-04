@@ -20,4 +20,6 @@ from arg_needle import (
     add_default_arg_building_arguments, normalize_arg, trim_arg
 )
 
-print("Successfully imported all arg_needle components")
+def test_import():
+    assert True
+    print("Successfully imported all arg_needle components")
