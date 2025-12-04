@@ -21,7 +21,7 @@ jobs:
       matrix:
         include:
           - os: ubuntu-24.04
-            py: "3.14"
+            py: "3.13"
             sys_install: "sudo apt -y update && sudo apt -y install libboost-iostreams-dev"
           - os: macos-15
             py: "3.10"
