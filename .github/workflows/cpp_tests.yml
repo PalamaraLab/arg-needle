@@ -56,7 +56,9 @@ jobs:
       - name: cmake build
         run: |
           cmake --build . --target cpp_tests --parallel 4
+        working-directory: build
 
       - name: ctest
         run: |
           ctest
+        working-directory: build

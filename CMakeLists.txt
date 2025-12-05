@@ -50,9 +50,6 @@ set(arg_needle_testdata_dir ${CMAKE_CURRENT_SOURCE_DIR}/testdata)
 add_definitions(-DARG_NEEDLE_TESTDATA_DIR=\"${arg_needle_testdata_dir}\")
 
 
-
-
-
 # Python bindings
 if (ARG_NEEDLE_PYTHON_BINDINGS)
     option(ARG_NEEDLE_BUILDING_FROM_PYPROJECT "Are we building from pyproject.toml (pip install)?" OFF)
