@@ -56,6 +56,7 @@ int AutoGzIfstream::lineCount(const std::string& file) {
   string line;
   while (getline(fin, line))
     ctr++;
+  fin.close();
   return ctr;
 }
 

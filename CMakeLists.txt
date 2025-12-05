@@ -74,10 +74,19 @@ endif ()
 
 
 add_subdirectory(src)
-#add_subdirectory(example)
 
-#option(ENABLE_TESTING "Enable Test Builds" ON)
-#if(ENABLE_TESTING)
-#    enable_testing()
-#    add_subdirectory(test)
-#endif()
+option(ARG_NEEDLE_TESTING "Enable ARG Needle unit testing" ON)
+if(ARG_NEEDLE_TESTING)
+    Include(FetchContent)
+    FetchContent_Declare(
+            Catch2
+            GIT_REPOSITORY https://github.com/catchorg/Catch2.git
+            GIT_TAG b3fb4b9feafcd8d91c5cb510a4775143fdbef02f # Version 3.11.0
+    )
+
+    FetchContent_MakeAvailable(Catch2)
+    list(APPEND CMAKE_MODULE_PATH ${catch2_SOURCE_DIR}/extras)
+    include(CTest)
+    include(Catch)
+    add_subdirectory(test/cpp)
+endif()
