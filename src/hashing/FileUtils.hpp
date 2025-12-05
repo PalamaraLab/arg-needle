@@ -29,30 +29,31 @@
 #define FILEUTILS_HPP
 
 #include <fstream>
+#include <filesystem>
+#include <memory>
 #include <string>
-#include <vector>
-
-#include <boost/iostreams/filtering_stream.hpp>
 
 namespace FileUtils {
 
-bool fileExists(const std::string& name);
+bool fileExists(const std::filesystem::path& file);
 
 class AutoGzIfstream {
-  boost::iostreams::filtering_istream boost_in;
-  std::ifstream fin;
+  struct Impl;
+  std::unique_ptr<Impl> pimpl;
 
 public:
-  static int lineCount(const std::string& file);
+  AutoGzIfstream();
+  ~AutoGzIfstream() noexcept;
 
-  void openOrExit(const std::string& file, std::ios_base::openmode mode = std::ios::in);
+  [[nodiscard]] static int lineCount(const std::filesystem::path& file);
+
+  void openOrExit(const std::filesystem::path& file, std::ios_base::openmode mode = std::ios::in);
   void close();
-  template <class T> AutoGzIfstream& operator>>(T& x) {
-    boost_in >> x;
-    return *this;
-  }
 
-  operator bool() const;
+  AutoGzIfstream& operator>>(std::string& x);
+
+  [[nodiscard]] explicit operator bool() const noexcept;
+
   friend AutoGzIfstream& getline(AutoGzIfstream& in, std::string& s);
 };
 
