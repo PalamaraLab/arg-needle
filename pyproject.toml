@@ -42,6 +42,7 @@ dependencies = [
 [project.optional-dependencies]
 dev = [
     "pytest",
+    "h5py",
 ]
 
 [project.scripts]
