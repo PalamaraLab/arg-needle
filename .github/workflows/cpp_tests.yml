@@ -60,5 +60,5 @@ jobs:
 
       - name: ctest
         run: |
-          ctest
+          ctest --output-on-failure
         working-directory: build

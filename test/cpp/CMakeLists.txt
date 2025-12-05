@@ -25,7 +25,7 @@ target_link_libraries(cpp_tests PRIVATE arg_needle_hashing Catch2::Catch2WithMai
 
 catch_discover_tests(cpp_tests)
 
-set(ARG_NEEDLE_TEST_DIR="${CMAKE_CURRENT_SOURCE_DIR}")
+set(ARG_NEEDLE_TEST_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
 set(ARG_NEEDLE_RESOURCES_DIR "${CMAKE_SOURCE_DIR}/src/arg_needle/resources")
 
 add_definitions(-DARG_NEEDLE_TEST_DIR=\"${ARG_NEEDLE_TEST_DIR}\")
