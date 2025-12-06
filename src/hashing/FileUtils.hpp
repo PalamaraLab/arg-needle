@@ -25,8 +25,8 @@
 // The license file can be found at 3rd_party/Eagle/COPYING from the
 // root of this repository.
 
-#ifndef FILEUTILS_HPP
-#define FILEUTILS_HPP
+#ifndef ARG_NEEDLE_FILE_UTILS_HPP
+#define ARG_NEEDLE_FILE_UTILS_HPP
 
 #include <filesystem>
 #include <memory>
@@ -129,4 +129,4 @@ namespace FileUtils {
     AutoGzIfstream &getline(AutoGzIfstream &in, std::string &s);
 } // namespace FileUtils
 
-#endif
+#endif // ARG_NEEDLE_FILE_UTILS_HPP

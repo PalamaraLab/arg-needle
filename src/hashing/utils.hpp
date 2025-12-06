@@ -17,8 +17,8 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef __UTILS_HPP_
-#define __UTILS_HPP_
+#ifndef ARG_NEEDLE_UTILS_HPP
+#define ARG_NEEDLE_UTILS_HPP
 
 #include <string>
 
@@ -28,3 +28,4 @@ using std::string;
 #define THROW_LINE(a) (string(__FILE__) + ":" + std::to_string(__LINE__) + ": " + a)
 
 #endif // __UTILS_HPP_
+#endif // ARG_NEEDLE_UTILS_HPP

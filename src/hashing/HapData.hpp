@@ -17,8 +17,8 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef __HAP_DATA_HPP_
-#define __HAP_DATA_HPP_
+#ifndef ARG_NEELE_HAP_DATA_HPP
+#define ARG_NEELE_HAP_DATA_HPP
 
 #include <iostream>
 #include <stdint.h>
@@ -82,4 +82,4 @@ public:
   friend ostream& operator<<(ostream& os, const HapData& data);
 };
 
-#endif // __HAP_DATA_HPP_
+#endif // ARG_NEELE_HAP_DATA_HPP
