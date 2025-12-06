@@ -28,37 +28,105 @@
 #ifndef FILEUTILS_HPP
 #define FILEUTILS_HPP
 
-#include <fstream>
 #include <filesystem>
 #include <memory>
 #include <string>
 
 namespace FileUtils {
+    /**
+     * @brief Check whether a given file exists on disk.
+     *
+     * @param file Path to the file to check.
+     * @return true if the file exists, false otherwise.
+     */
+    bool fileExists(const std::filesystem::path &file);
 
-bool fileExists(const std::filesystem::path& file);
+    /**
+     * @class AutoGzIfstream
+     * @brief Stream wrapper that transparently reads either plain-text or gzip-compressed files.
+     *
+     * AutoGzIfstream detects whether an input file is compressed (.gz) and automatically
+     * opens it appropriately. It behaves similarly to std::ifstream but supports reading
+     * gzip-compressed streams without requiring explicit decompression by the caller.
+     *
+     * Internally uses a pimpl to hide implementation details and avoid exposing boost
+     * libraries at the interface level.
+     */
+    class AutoGzIfstream {
+        struct Impl;
+        std::unique_ptr<Impl> pimpl;
 
-class AutoGzIfstream {
-  struct Impl;
-  std::unique_ptr<Impl> pimpl;
+    public:
+        /**
+         * @brief Construct an unopened AutoGzIfstream.
+         */
+        AutoGzIfstream();
 
-public:
-  AutoGzIfstream();
-  ~AutoGzIfstream() noexcept;
+        /**
+         * @brief Destructor closes the stream if open and releases internal resources.
+         */
+        ~AutoGzIfstream() noexcept;
 
-  [[nodiscard]] static int lineCount(const std::filesystem::path& file);
+        /**
+         * @brief Count the number of lines in a file (supports gzipped and plain files).
+         *
+         * @param file Path to the file whose line count will be computed.
+         * @return Number of lines in the file.
+         */
+        [[nodiscard]] static int lineCount(const std::filesystem::path &file);
 
-  void openOrExit(const std::filesystem::path& file, std::ios_base::openmode mode = std::ios::in);
-  void close();
+        /**
+         * @brief Open a file for reading or exit the program if opening fails.
+         *
+         * Automatically detects gzip compression based on file contents.
+         *
+         * @param file Path to the file to open.
+         * @param mode Stream opening mode (defaults to std::ios::in).
+         */
+        void openOrExit(const std::filesystem::path &file,
+                        std::ios_base::openmode mode = std::ios::in);
 
-  AutoGzIfstream& operator>>(std::string& x);
+        /**
+         * @brief Close the underlying stream.
+         */
+        void close();
 
-  [[nodiscard]] explicit operator bool() const noexcept;
+        /**
+         * @brief Read whitespace-delimited input into a string via the extraction operator.
+         *
+         * @param x Output string that will receive the parsed token.
+         * @return Reference to this stream.
+         */
+        AutoGzIfstream &operator>>(std::string &x);
 
-  friend AutoGzIfstream& getline(AutoGzIfstream& in, std::string& s);
-};
+        /**
+         * @brief Boolean conversion indicating whether the stream is currently valid.
+         *
+         * Allows usage in conditions such as:
+         * @code
+         * if (stream) { ... }
+         * @endcode
+         *
+         * @return true if the stream is open and in a good state, false otherwise.
+         */
+        [[nodiscard]] explicit operator bool() const noexcept;
 
-AutoGzIfstream& getline(AutoGzIfstream& in, std::string& s);
+        /**
+         * @brief Friend declaration enabling getline(AutoGzIfstream&, ...).
+         */
+        friend AutoGzIfstream &getline(AutoGzIfstream &in, std::string &s);
+    };
 
+    /**
+     * @brief Read a full line from an AutoGzIfstream into a string.
+     *
+     * Supports both compressed and uncompressed input sources.
+     *
+     * @param in Stream to read from.
+     * @param s Output string receiving the line (without delimiter).
+     * @return Reference to the stream.
+     */
+    AutoGzIfstream &getline(AutoGzIfstream &in, std::string &s);
 } // namespace FileUtils
 
 #endif

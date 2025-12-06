@@ -25,77 +25,73 @@
 // The license file can be found at 3rd_party/Eagle/COPYING from the
 // root of this repository.
 
-#include <cstdio>
-#include <cstdlib>
-#include <fstream>
-#include <iostream>
-#include <string>
-#include <vector>
-
 #include "FileUtils.hpp"
 
 #include <boost/iostreams/filter/gzip.hpp>
 #include <boost/iostreams/filtering_stream.hpp>
 
+#include <cstdio>
+#include <fstream>
+#include <iostream>
+#include <string>
+
 namespace FileUtils {
 
-using std::cerr;
-using std::endl;
-using std::string;
-using std::vector;
+    struct AutoGzIfstream::Impl {
+        boost::iostreams::filtering_istream boost_in;
+        std::ifstream fin;
+    };
 
-struct AutoGzIfstream::Impl {
-  boost::iostreams::filtering_istream boost_in;
-  std::ifstream fin;
-};
+    AutoGzIfstream::AutoGzIfstream() : pimpl(std::make_unique<Impl>()) {
+    }
 
-AutoGzIfstream::AutoGzIfstream() : pimpl(std::make_unique<Impl>()) {}
-AutoGzIfstream::~AutoGzIfstream() noexcept = default;
+    AutoGzIfstream::~AutoGzIfstream() noexcept = default;
 
-bool fileExists(const std::filesystem::path& file) {
-  std::ifstream f(file.c_str());
-  return f.good();
-}
+    bool fileExists(const std::filesystem::path &file) {
+        std::ifstream f(file.c_str());
+        return f.good();
+    }
 
-int AutoGzIfstream::lineCount(const std::filesystem::path& file) {
-  AutoGzIfstream fin;
-  fin.openOrExit(file);
-  int ctr = 0;
-  string line;
-  while (getline(fin, line))
-    ctr++;
-  fin.close();
-  return ctr;
-}
+    int AutoGzIfstream::lineCount(const std::filesystem::path &file) {
+        AutoGzIfstream fin;
+        fin.openOrExit(file);
+        int ctr = 0;
+        std::string line;
+        while (getline(fin, line)) {
+            ctr++;
+        }
+        fin.close();
+        return ctr;
+    }
 
-void AutoGzIfstream::openOrExit(const std::filesystem::path& file, std::ios_base::openmode mode) {
-  pimpl->fin.open(file.c_str(), mode);
-  if (!pimpl->fin) {
-    cerr << "ERROR: Unable to open file: " << file << endl;
-    exit(1);
-  }
-  if ((int) file.string().length() > 3 && file.string().substr(file.string().length() - 3) == ".gz")
-    pimpl->boost_in.push(boost::iostreams::gzip_decompressor());
-  pimpl->boost_in.push(pimpl->fin);
-}
+    void AutoGzIfstream::openOrExit(const std::filesystem::path &file, std::ios_base::openmode mode) {
+        pimpl->fin.open(file.c_str(), mode);
+        if (!pimpl->fin) {
+            std::cerr << "ERROR: Unable to open file: " << file << std::endl;
+            exit(1);
+        }
+        if (file.extension() == ".gz") {
+            pimpl->boost_in.push(boost::iostreams::gzip_decompressor());
+        }
+        pimpl->boost_in.push(pimpl->fin);
+    }
 
-void AutoGzIfstream::close() {
-  pimpl->fin.close();
-  pimpl->boost_in.reset();
-}
+    void AutoGzIfstream::close() {
+        pimpl->fin.close();
+        pimpl->boost_in.reset();
+    }
 
-AutoGzIfstream::operator bool() const noexcept {
-  return !pimpl->boost_in.fail();
-}
+    AutoGzIfstream::operator bool() const noexcept {
+        return !pimpl->boost_in.fail();
+    }
 
-AutoGzIfstream& getline(AutoGzIfstream& in, std::string& s) {
-  std::getline(in.pimpl->boost_in, s);
-  return in;
-}
+    AutoGzIfstream &getline(AutoGzIfstream &in, std::string &s) {
+        std::getline(in.pimpl->boost_in, s);
+        return in;
+    }
 
-AutoGzIfstream& AutoGzIfstream::operator>>(std::string& x) {
-  pimpl->boost_in >> x;
-  return *this;
-}
-
+    AutoGzIfstream &AutoGzIfstream::operator>>(std::string &x) {
+        pimpl->boost_in >> x;
+        return *this;
+    }
 } // namespace FileUtils
