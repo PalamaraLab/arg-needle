@@ -1,4 +1,4 @@
-name: Python unit tests
+name: Python tests
 
 on:
   push:
@@ -12,7 +12,7 @@ on:
 jobs:
 
   build-and-test:
-    name: Python unit tests
+    name: Python tests
     runs-on: ${{ matrix.os }}
     timeout-minutes: 10
 
