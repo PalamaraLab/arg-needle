@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-find_package(Boost COMPONENTS iostreams REQUIRED)
+find_package(Boost CONFIG COMPONENTS iostreams REQUIRED)
 
 set(
         arg_needle_hashing_src
