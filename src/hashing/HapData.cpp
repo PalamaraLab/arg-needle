@@ -33,18 +33,8 @@
 #include "HapData.hpp"
 #include "utils.hpp"
 
-using std::cerr;
-using std::cout;
-using std::deque;
-using std::endl;
-using std::ostream;
-using std::pair;
-using std::string;
-using std::tuple;
-using std::unordered_map;
-using std::unordered_set;
 
-HapData::HapData(string mode, string file_root_path, unsigned int _word_size, string map_file_path,
+HapData::HapData(std::string mode, std::string file_root_path, unsigned int _word_size, std::string map_file_path,
                  bool fill_sites)
     : word_size(_word_size) {
   if (mode == "sequence") {
@@ -68,7 +58,7 @@ HapData::HapData(string mode, string file_root_path, unsigned int _word_size, st
     throw std::logic_error(make_error("Out of bounds word size."));
   }
 
-  string line;
+  std::string line;
   std::stringstream ss;
 
   // read in .sample[s] file
@@ -80,14 +70,14 @@ HapData::HapData(string mode, string file_root_path, unsigned int _word_size, st
     file_samples.openOrExit(file_root_path + ".sample");
   }
   else {
-    cerr << "ERROR. Could not find sample file in " + file_root_path + ".sample[s]" << endl;
+    std::cerr << "ERROR. Could not find sample file in " + file_root_path + ".sample[s]" << std::endl;
     exit(1);
   }
 
   while (getline(file_samples, line)) {
-    vector<string> splitStr;
+    std::vector<std::string> splitStr;
     std::istringstream iss(line);
-    string buf;
+    std::string buf;
     while (iss >> buf)
       splitStr.push_back(buf);
 
@@ -112,7 +102,7 @@ HapData::HapData(string mode, string file_root_path, unsigned int _word_size, st
       // cout << "Using genetic map " << map_file_path << endl;
     }
     else {
-      cerr << "ERROR. Could not open map file " + map_file_path + ", no such file" << endl;
+      std::cerr << "ERROR. Could not open map file " + map_file_path + ", no such file" << std::endl;
       exit(1);
     }
   }
@@ -127,13 +117,13 @@ HapData::HapData(string mode, string file_root_path, unsigned int _word_size, st
       // cout << "Using genetic map " << file_root_path << ".map" << endl;
     }
     else {
-      cerr << "ERROR. Could not find map file in " + file_root_path + ".map.gz or " +
+      std::cerr << "ERROR. Could not find map file in " + file_root_path + ".map.gz or " +
                   file_root_path + ".map"
-           << endl;
+           << std::endl;
       exit(1);
     }
   }
-  string map_field[4];
+  std::string map_field[4];
   while (getline(file_map, line)) {
     ss.clear();
     ss.str(line);
@@ -159,17 +149,17 @@ HapData::HapData(string mode, string file_root_path, unsigned int _word_size, st
     file_hap.openOrExit(file_root_path + ".haps");
   }
   else {
-    cerr << "ERROR. Could not find hap file in " + file_root_path + ".hap.gz, " + file_root_path +
+    std::cerr << "ERROR. Could not find hap file in " + file_root_path + ".hap.gz, " + file_root_path +
                 ".hap, " + ".haps.gz, or " + file_root_path + ".haps"
-         << endl;
+         << std::endl;
     exit(1);
   }
 
   if (fill_sites) {
-    sites = vector<vector<bool>>(num_haps, vector<bool>());
+    sites = std::vector<std::vector<bool>>(num_haps, std::vector<bool>());
   }
-  words = vector<vector<word_type>>(num_haps, vector<word_type>());
-  string marker_id;
+  words = std::vector<std::vector<word_type>>(num_haps, std::vector<word_type>());
+  std::string marker_id;
   unsigned long int marker_pos;
   char al[2], inp;
   int site_id = 0;
@@ -237,12 +227,12 @@ void HapData::add_to_hash(size_t hap_id) {
   }
 
   if (hashes.empty()) {
-    hashes = vector<unordered_map<word_type, vector<size_t>>>(
-        words[hap_id].size(), unordered_map<word_type, vector<size_t>>());
+    hashes = std::vector<std::unordered_map<word_type, std::vector<size_t>>>(
+        words[hap_id].size(), std::unordered_map<word_type, std::vector<size_t>>());
   }
 
   for (size_t i = 0; i < words[hap_id].size(); ++i) {
-    vector<size_t>& hash_value =
+    std::vector<size_t>& hash_value =
         hashes[i][words[hap_id][i]]; // creates if not present, only hashes once
     hash_value.push_back(hap_id);
   }
@@ -254,21 +244,21 @@ void HapData::print_hap(size_t hap_id) {
   if (hap_id >= num_haps) {
     throw std::logic_error(make_error("Haplotype ID out of bounds."));
   }
-  cout << "Bits for hap_id = " << hap_id << endl;
+  std::cout << "Bits for hap_id = " << hap_id << std::endl;
   for (size_t site_id = 0; site_id < num_sites; ++site_id) {
-    cout << sites[hap_id][site_id];
+    std::cout << sites[hap_id][site_id];
     if (site_id % word_size == word_size - 1) {
-      cout << " ";
+      std::cout << " ";
     }
   }
-  cout << endl;
+  std::cout << std::endl;
 
-  cout << "Words (hex) for hap_id = " << hap_id << endl;
+  std::cout << "Words (hex) for hap_id = " << hap_id << std::endl;
   std::cout << std::hex << std::showbase;
   for (auto const& word : words[hap_id]) {
-    cout << word << " ";
+    std::cout << word << " ";
   }
-  cout << endl;
+  std::cout << std::endl;
   std::cout << std::dec << std::noshowbase;
 
   // cout << "Words (decimal)" << endl;
@@ -280,22 +270,22 @@ void HapData::print_hap(size_t hap_id) {
 
 void HapData::print_hashes() {
   for (size_t i = 0; i < hashes.size(); ++i) {
-    cout << "Hash for word " << i << " of " << hashes.size() << endl;
+    std::cout << "Hash for word " << i << " of " << hashes.size() << std::endl;
     for (auto const& map_entry : hashes[i]) {
       unsigned int num_bits = word_size;
       if (i == hashes.size() - 1) {
         num_bits = ((num_sites - 1) % word_size) + 1;
       }
       for (size_t j = 0; j < num_bits; ++j) {
-        cout << ((map_entry.first >> j) & 1);
+        std::cout << ((map_entry.first >> j) & 1);
       }
-      cout << ":";
+      std::cout << ":";
       for (const size_t id : map_entry.second) {
-        cout << " " << id;
+        std::cout << " " << id;
       }
-      cout << endl;
+      std::cout << std::endl;
     }
-    cout << endl;
+    std::cout << std::endl;
   }
 }
 
@@ -306,31 +296,31 @@ void HapData::print_word_match_diagram(size_t hap_id1, size_t hap_id2) {
   for (size_t i = 0; i < words[hap_id1].size(); ++i) {
     if (i != 0) {
       if (i % 100 == 0) {
-        cout << endl;
+        std::cout << std::endl;
       }
       if (i % 25 == 0) {
-        cout << endl;
+        std::cout << std::endl;
       }
       else if (i % 5 == 0) {
-        cout << " ";
+        std::cout << " ";
       }
     }
     if (words[hap_id1][i] == words[hap_id2][i]) {
-      cout << "x";
+      std::cout << "x";
     }
     else {
-      cout << "_";
+      std::cout << "_";
     }
   }
-  cout << endl;
+  std::cout << std::endl;
 }
 
-vector<tuple<size_t, size_t, vector<pair<size_t, double>>>>
+std::vector<std::tuple<size_t, size_t, std::vector<std::pair<size_t, double>>>>
 HapData::get_closest_cousins(size_t hap_id, unsigned int k, unsigned int tolerance,
                              double window_size_genetic) {
 
   // find the windows
-  vector<Window> windows; // Window defined in HapData.hpp
+  std::vector<Window> windows; // Window defined in HapData.hpp
   size_t num_words = words[hap_id].size();
   if (window_size_genetic <= 0) {
     // make a new window for each and every word
@@ -367,7 +357,7 @@ HapData::get_closest_cousins(size_t hap_id, unsigned int k, unsigned int toleran
     }
   }
 
-  vector<size_t> words_to_windows;
+  std::vector<size_t> words_to_windows;
   for (size_t i = 0; i < windows.size(); ++i) {
     Window w = windows[i];
     for (size_t j = w.start; j < w.end; ++j) {
@@ -377,17 +367,17 @@ HapData::get_closest_cousins(size_t hap_id, unsigned int k, unsigned int toleran
 
   // how high each sample scores in each window
   // we only record samples that have matched
-  vector<unordered_map<size_t, size_t>> window_scores(
-      windows.size(), unordered_map<size_t, size_t>());
+  std::vector<std::unordered_map<size_t, size_t>> window_scores(
+      windows.size(), std::unordered_map<size_t, size_t>());
   // stretches of matching material separated by 2*k + 1 fillers, where k is the number
   // of mismatches, max size defined by 2*tolerance + 1
-  vector<deque<pair<size_t, size_t>>> stretches(hap_id, deque<pair<size_t, size_t>>());
+  std::vector<std::deque<std::pair<size_t, size_t>>> stretches(hap_id, std::deque<std::pair<size_t, size_t>>());
 
   // size_t num_overall_matches = 0;
   for (size_t i = 0; i < num_words; ++i) {
     // in some cases, the word does not yet exist in the hashmap
     if (hashes[i].find(words[hap_id][i]) != hashes[i].end()) {
-      const vector<size_t>& hash_value = hashes[i].find(words[hap_id][i])->second;
+      const std::vector<size_t>& hash_value = hashes[i].find(words[hap_id][i])->second;
       // num_overall_matches += hash_value.size();
       for (auto v : hash_value) {
         // check the end of stretches to figure out what to do
@@ -395,7 +385,7 @@ HapData::get_closest_cousins(size_t hap_id, unsigned int k, unsigned int toleran
           stretches[v].emplace_back(i, i + 1); // end is exclusive
         }
         else {
-          pair<size_t, size_t>& back_pair = stretches[v].back();
+          std::pair<size_t, size_t>& back_pair = stretches[v].back();
           if (back_pair.second == i) {
             back_pair.second = i + 1; // end is exclusive
           }
@@ -419,7 +409,7 @@ HapData::get_closest_cousins(size_t hap_id, unsigned int k, unsigned int toleran
 
         // pop_front to get to size 2*tolerance + 1
         while (stretches[v].size() > 2 * tolerance + 1) {
-          pair<size_t, size_t>& item = stretches[v].front();
+          std::pair<size_t, size_t>& item = stretches[v].front();
           if (item.second != 0) {
             size_t range_start = item.first;
             // old version was buggy
@@ -455,7 +445,7 @@ HapData::get_closest_cousins(size_t hap_id, unsigned int k, unsigned int toleran
   // go over all the stretches and pop_front
   for (size_t v = 0; v < hap_id; ++v) {
     while (stretches[v].size() > 0) {
-      pair<size_t, size_t> item = stretches[v].front();
+      std::pair<size_t, size_t> item = stretches[v].front();
       if (item.second != 0) {
         size_t range_start = item.first;
         // old version is buggy in general, but should work in this case
@@ -487,12 +477,12 @@ HapData::get_closest_cousins(size_t hap_id, unsigned int k, unsigned int toleran
   }
 
   // take the values in window_scores and sort to find top k
-  vector<tuple<size_t, size_t, vector<pair<size_t, double>>>> results;
+  std::vector<std::tuple<size_t, size_t, std::vector<std::pair<size_t, double>>>> results;
   for (const Window& w : windows) {
     size_t window_start_site = w.start * word_size;
     size_t window_end_site = std::min<size_t>(w.end * word_size - 1, num_sites - 1);
 
-    vector<pair<double, size_t>> stats;
+    std::vector<std::pair<double, size_t>> stats;
     for (const auto& map_entry : window_scores[w.index]) {
       size_t hap_id = map_entry.first;
       double score = (double) map_entry.second;
@@ -501,14 +491,14 @@ HapData::get_closest_cousins(size_t hap_id, unsigned int k, unsigned int toleran
     size_t actual_k = std::min<size_t>(k, stats.size());
     // use this if we want sorted
     std::partial_sort(
-        stats.begin(), stats.begin() + actual_k, stats.end(), std::greater<pair<double, size_t>>());
+        stats.begin(), stats.begin() + actual_k, stats.end(), std::greater<std::pair<double, size_t>>());
     // use this if we don't care about sorted
     // std::nth_element(stats.begin(), stats.begin() + actual_k, stats.end(),
     // std::greater<pair<double, size_t>>());
 
     // append to results
     results.push_back(
-        std::make_tuple(window_start_site, window_end_site, vector<pair<size_t, double>>()));
+        std::make_tuple(window_start_site, window_end_site, std::vector<std::pair<size_t, double>>()));
     for (size_t stats_idx = 0; stats_idx < actual_k; ++stats_idx) {
       std::get<2>(results[results.size() - 1])
           .emplace_back(stats[stats_idx].second, stats[stats_idx].first);
@@ -518,7 +508,7 @@ HapData::get_closest_cousins(size_t hap_id, unsigned int k, unsigned int toleran
   return results;
 }
 
-ostream& operator<<(ostream& os, const HapData& data) {
+std::ostream& operator<<(std::ostream& os, const HapData& data) {
   os << "HapData with " << data.num_haps << " haplotypes and " << data.num_sites;
   os << " sites, word size = " << data.word_size << " bits";
   return os;
