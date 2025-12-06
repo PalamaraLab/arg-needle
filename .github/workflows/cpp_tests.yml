@@ -1,0 +1,64 @@
+name: C++ unit tests
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - '**'
+  workflow_dispatch:
+
+jobs:
+
+  build-and-test:
+    name: C++ unit tests
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 10
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-24.04
+            cxx: "clang++-18"
+            sys_install: "sudo apt -y update && sudo apt -y install libboost-iostreams-dev"
+          - os: ubuntu-24.04-arm
+            cxx: "g++-12"
+            sys_install: "sudo apt -y update && sudo apt -y install libboost-iostreams-dev"
+          - os: macos-15
+            cxx: ""
+            sys_install: "brew install boost"
+          - os: macos-15
+            cxx: "$(brew --prefix llvm@18)/bin/clang"
+            sys_install: "brew install boost"
+
+    steps:
+      - name: checkout repo & submodules
+        uses: actions/checkout@v5
+        with:
+          submodules: true
+          fetch-depth: 0
+
+      - name: install deps
+        run: |
+          ${{ matrix.sys_install }}
+
+      - name: make build dir
+        run: |
+          mkdir build
+
+      - name: cmake configure
+        run: |
+          cmake ..
+        working-directory: build
+
+      - name: cmake build
+        run: |
+          cmake --build . --target cpp_tests --parallel 4
+        working-directory: build
+
+      - name: ctest
+        run: |
+          ctest --output-on-failure
+        working-directory: build

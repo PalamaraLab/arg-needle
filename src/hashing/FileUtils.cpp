@@ -44,44 +44,58 @@ using std::endl;
 using std::string;
 using std::vector;
 
-bool fileExists(const std::string& name) {
-  std::ifstream f(name.c_str());
+struct AutoGzIfstream::Impl {
+  boost::iostreams::filtering_istream boost_in;
+  std::ifstream fin;
+};
+
+AutoGzIfstream::AutoGzIfstream() : pimpl(std::make_unique<Impl>()) {}
+AutoGzIfstream::~AutoGzIfstream() noexcept = default;
+
+bool fileExists(const std::filesystem::path& file) {
+  std::ifstream f(file.c_str());
   return f.good();
 }
 
-int AutoGzIfstream::lineCount(const std::string& file) {
+int AutoGzIfstream::lineCount(const std::filesystem::path& file) {
   AutoGzIfstream fin;
   fin.openOrExit(file);
   int ctr = 0;
   string line;
   while (getline(fin, line))
     ctr++;
+  fin.close();
   return ctr;
 }
 
-void AutoGzIfstream::openOrExit(const std::string& file, std::ios_base::openmode mode) {
-  fin.open(file.c_str(), mode);
-  if (!fin) {
+void AutoGzIfstream::openOrExit(const std::filesystem::path& file, std::ios_base::openmode mode) {
+  pimpl->fin.open(file.c_str(), mode);
+  if (!pimpl->fin) {
     cerr << "ERROR: Unable to open file: " << file << endl;
     exit(1);
   }
-  if ((int) file.length() > 3 && file.substr(file.length() - 3) == ".gz")
-    boost_in.push(boost::iostreams::gzip_decompressor());
-  boost_in.push(fin);
+  if ((int) file.string().length() > 3 && file.string().substr(file.string().length() - 3) == ".gz")
+    pimpl->boost_in.push(boost::iostreams::gzip_decompressor());
+  pimpl->boost_in.push(pimpl->fin);
 }
 
 void AutoGzIfstream::close() {
-  fin.close();
-  boost_in.reset();
+  pimpl->fin.close();
+  pimpl->boost_in.reset();
 }
 
-AutoGzIfstream::operator bool() const {
-  return !boost_in.fail();
+AutoGzIfstream::operator bool() const noexcept {
+  return !pimpl->boost_in.fail();
 }
 
 AutoGzIfstream& getline(AutoGzIfstream& in, std::string& s) {
-  std::getline(in.boost_in, s);
+  std::getline(in.pimpl->boost_in, s);
   return in;
+}
+
+AutoGzIfstream& AutoGzIfstream::operator>>(std::string& x) {
+  pimpl->boost_in >> x;
+  return *this;
 }
 
 } // namespace FileUtils
