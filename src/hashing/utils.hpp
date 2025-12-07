@@ -21,13 +21,11 @@
 #define ARG_NEEDLE_UTILS_HPP
 
 #include <string>
-#include <source_location>
 
-inline std::string make_error(const std::string& msg,
-                              const std::source_location& loc = std::source_location::current())
-{
-  return std::string(loc.file_name()) + ":" +
-         std::to_string(loc.line()) + ": " + msg;
+inline std::string make_error(const std::string &msg, const char *file, const int line) noexcept {
+    return std::string(file) + ":" + std::to_string(line) + ": " + msg;
 }
+
+#define MAKE_ERROR(msg) (make_error((msg), __FILE__, __LINE__))
 
 #endif // ARG_NEEDLE_UTILS_HPP

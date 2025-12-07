@@ -56,7 +56,7 @@ PYBIND11_MODULE(arg_needle_hashing_pybind, m) {
           "physical_position_at",
           [](const HapData& data, size_t site) {
             if (site >= data.num_sites) {
-              throw std::logic_error(make_error("Out of bounds site."));
+              throw std::logic_error(MAKE_ERROR("Out of bounds site."));
             }
             return data.physical_positions[site];
           },
@@ -65,7 +65,7 @@ PYBIND11_MODULE(arg_needle_hashing_pybind, m) {
           "genetic_position_at",
           [](const HapData& data, size_t site) {
             if (site >= data.num_sites) {
-              throw std::logic_error(make_error("Out of bounds site."));
+              throw std::logic_error(MAKE_ERROR("Out of bounds site."));
             }
             return data.genetic_positions[site];
           },
@@ -74,7 +74,7 @@ PYBIND11_MODULE(arg_needle_hashing_pybind, m) {
           "site_maf_at",
           [](const HapData& data, size_t site) {
             if (site >= data.num_sites) {
-              throw std::logic_error(make_error("Out of bounds site."));
+              throw std::logic_error(MAKE_ERROR("Out of bounds site."));
             }
             return data.site_mafs[site];
           },
@@ -83,7 +83,7 @@ PYBIND11_MODULE(arg_needle_hashing_pybind, m) {
           "sample_name",
           [](const HapData& data, size_t hap_id) {
             if (hap_id >= data.num_haps) {
-              throw std::logic_error(make_error("Out of bounds hap_id."));
+              throw std::logic_error(MAKE_ERROR("Out of bounds hap_id."));
             }
             return data.sample_names[hap_id];
           },

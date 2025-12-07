@@ -26,7 +26,7 @@
 using Catch::Matchers::ContainsSubstring;
 
 void test_throw() {
-  throw std::logic_error(make_error("Something went wrong"));
+  throw std::logic_error(MAKE_ERROR("Something went wrong"));
 }
 
 

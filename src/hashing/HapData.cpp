@@ -44,18 +44,18 @@ HapData::HapData(std::string mode, std::string file_root_path, unsigned int _wor
     data_mode = HapDataMode::array;
   }
   else {
-    throw std::logic_error(make_error("Mode not recognized."));
+    throw std::logic_error(MAKE_ERROR("Mode not recognized."));
   }
 
   if (sizeof(word_type) != 8) {
-    throw std::logic_error(make_error("Expected word_type to be 8 bytes (64 bits)."));
+    throw std::logic_error(MAKE_ERROR("Expected word_type to be 8 bytes (64 bits)."));
   }
   if (sizeof(1ull) < 8) {
     throw std::logic_error(
-        make_error("Expected unsigned long long to be at least 8 bytes (64 bits)."));
+        MAKE_ERROR("Expected unsigned long long to be at least 8 bytes (64 bits)."));
   }
   if (word_size > 64 || word_size <= 0) {
-    throw std::logic_error(make_error("Out of bounds word size."));
+    throw std::logic_error(MAKE_ERROR("Out of bounds word size."));
   }
 
   std::string line;
@@ -212,10 +212,10 @@ HapData::HapData(std::string mode, std::string file_root_path, unsigned int _wor
 
 void HapData::add_to_hash(size_t hap_id) {
   if (hashed_hap_ids.find(hap_id) != hashed_hap_ids.end()) {
-    throw std::logic_error(make_error("This haplotype has already been hashed."));
+    throw std::logic_error(MAKE_ERROR("This haplotype has already been hashed."));
   }
   if (hap_id >= num_haps) {
-    throw std::logic_error(make_error("Haplotype ID out of bounds."));
+    throw std::logic_error(MAKE_ERROR("Haplotype ID out of bounds."));
   }
 
   if (hashes.empty()) {
@@ -234,7 +234,7 @@ void HapData::add_to_hash(size_t hap_id) {
 
 void HapData::print_hap(size_t hap_id) {
   if (hap_id >= num_haps) {
-    throw std::logic_error(make_error("Haplotype ID out of bounds."));
+    throw std::logic_error(MAKE_ERROR("Haplotype ID out of bounds."));
   }
   std::cout << "Bits for hap_id = " << hap_id << std::endl;
   for (size_t site_id = 0; site_id < num_sites; ++site_id) {
@@ -283,7 +283,7 @@ void HapData::print_hashes() {
 
 void HapData::print_word_match_diagram(size_t hap_id1, size_t hap_id2) {
   if (hap_id1 >= num_haps || hap_id2 >= num_haps) {
-    throw std::logic_error(make_error("Haplotype ID out of bounds."));
+    throw std::logic_error(MAKE_ERROR("Haplotype ID out of bounds."));
   }
   for (size_t i = 0; i < words[hap_id1].size(); ++i) {
     if (i != 0) {
