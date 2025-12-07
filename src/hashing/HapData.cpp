@@ -95,11 +95,10 @@ HapData::HapData(std::string mode, std::string file_root_path, unsigned int _wor
 
   // Parse .map[.gz] file
   FileUtils::AutoGzIfstream file_map;
-  if (map_file_path != "") {
+  if (!map_file_path.empty()) {
     // Attempt to read in .map[.gz] file
     if (FileUtils::fileExists(map_file_path)) {
       file_map.openOrExit(map_file_path);
-      // cout << "Using genetic map " << map_file_path << endl;
     }
     else {
       std::cerr << "ERROR. Could not open map file " + map_file_path + ", no such file" << std::endl;
@@ -110,11 +109,9 @@ HapData::HapData(std::string mode, std::string file_root_path, unsigned int _wor
     // If no map file is specified, default to file_root_path.map[.gz]
     if (FileUtils::fileExists(file_root_path + ".map.gz")) {
       file_map.openOrExit(file_root_path + ".map.gz");
-      // cout << "Using genetic map " << file_root_path << ".map.gz" << endl;
     }
     else if (FileUtils::fileExists(file_root_path + ".map")) {
       file_map.openOrExit(file_root_path + ".map");
-      // cout << "Using genetic map " << file_root_path << ".map" << endl;
     }
     else {
       std::cerr << "ERROR. Could not find map file in " + file_root_path + ".map.gz or " +
@@ -162,14 +159,15 @@ HapData::HapData(std::string mode, std::string file_root_path, unsigned int _wor
   std::string marker_id;
   unsigned long int marker_pos;
   char al[2], inp;
-  int site_id = 0;
+  unsigned int site_id = 0u;
   while (getline(file_hap, line)) {
     // read the meta data
     ss.clear();
     ss.str(line);
     ss >> map_field[0] >> marker_id >> marker_pos >> al[0] >> al[1];
-    if (map_field[0] == "")
+    if (map_field[0].empty()) {
       continue;
+    }
 
     if (site_id % word_size == 0) {
       for (size_t hap_id = 0; hap_id < num_haps; ++hap_id) {
@@ -202,20 +200,14 @@ HapData::HapData(std::string mode, std::string file_root_path, unsigned int _wor
         }
       }
     }
-    float maf = (float) maf_ctr / num_haps;
-    if (maf > 0.5) {
-      maf = 1 - maf;
+    float maf = static_cast<float>(maf_ctr) / static_cast<float>(num_haps);
+    if (maf > 0.5f) {
+      maf = 1.f - maf;
     }
     site_mafs.push_back(maf);
     ++site_id;
   }
   file_hap.close();
-}
-
-HapData::~HapData() {
-#ifdef _DEBUG
-  cout << "Deleting: " << *this << endl;
-#endif // _DEBUG
 }
 
 void HapData::add_to_hash(size_t hap_id) {
@@ -272,9 +264,9 @@ void HapData::print_hashes() {
   for (size_t i = 0; i < hashes.size(); ++i) {
     std::cout << "Hash for word " << i << " of " << hashes.size() << std::endl;
     for (auto const& map_entry : hashes[i]) {
-      unsigned int num_bits = word_size;
+      unsigned long num_bits = word_size;
       if (i == hashes.size() - 1) {
-        num_bits = ((num_sites - 1) % word_size) + 1;
+        num_bits = ((num_sites - 1ul) % word_size) + 1ul;
       }
       for (size_t j = 0; j < num_bits; ++j) {
         std::cout << ((map_entry.first >> j) & 1);
@@ -325,7 +317,7 @@ HapData::get_closest_cousins(size_t hap_id, unsigned int k, unsigned int toleran
   if (window_size_genetic <= 0) {
     // make a new window for each and every word
     for (size_t j = 0; j < num_words; ++j) {
-      Window w;
+      Window w{};
       w.start = j;
       w.end = j + 1;
       w.index = j;
@@ -343,7 +335,7 @@ HapData::get_closest_cousins(size_t hap_id, unsigned int k, unsigned int toleran
           (genetic_positions[last_word_site] - start_genetic >= window_size_genetic &&
            genetic_positions[num_sites - 1] - genetic_positions[last_word_site + 1] >=
                window_size_genetic)) {
-        Window w;
+        Window w{};
         w.start = start_word;
         w.end = j + 1;
         w.index = window_index;
@@ -377,11 +369,10 @@ HapData::get_closest_cousins(size_t hap_id, unsigned int k, unsigned int toleran
   for (size_t i = 0; i < num_words; ++i) {
     // in some cases, the word does not yet exist in the hashmap
     if (hashes[i].find(words[hap_id][i]) != hashes[i].end()) {
-      const std::vector<size_t>& hash_value = hashes[i].find(words[hap_id][i])->second;
-      // num_overall_matches += hash_value.size();
-      for (auto v : hash_value) {
+      const std::vector<size_t>& matches = hashes[i].find(words[hap_id][i])->second;
+      for (auto v : matches) {
         // check the end of stretches to figure out what to do
-        if (stretches[v].size() == 0) {
+        if (stretches[v].empty()) {
           stretches[v].emplace_back(i, i + 1); // end is exclusive
         }
         else {
@@ -429,10 +420,10 @@ HapData::get_closest_cousins(size_t hap_id, unsigned int k, unsigned int toleran
             // if our range is [6, 16), we want [5, 10) to [15, 20) inclusive
             for (size_t window_index = words_to_windows[range_start];
                  window_index <= words_to_windows[range_end - 1]; ++window_index) {
-              size_t& hash_value =
+              size_t& best_len =
                   window_scores[window_index][v]; // creates if not present, only hashes once
-              if (range_size > hash_value) {
-                hash_value = range_size;
+              if (range_size > best_len) {
+                best_len = range_size;
               }
             }
           }
@@ -444,7 +435,7 @@ HapData::get_closest_cousins(size_t hap_id, unsigned int k, unsigned int toleran
 
   // go over all the stretches and pop_front
   for (size_t v = 0; v < hap_id; ++v) {
-    while (stretches[v].size() > 0) {
+    while (!stretches[v].empty()) {
       std::pair<size_t, size_t> item = stretches[v].front();
       if (item.second != 0) {
         size_t range_start = item.first;
@@ -484,21 +475,20 @@ HapData::get_closest_cousins(size_t hap_id, unsigned int k, unsigned int toleran
 
     std::vector<std::pair<double, size_t>> stats;
     for (const auto& map_entry : window_scores[w.index]) {
-      size_t hap_id = map_entry.first;
-      double score = (double) map_entry.second;
-      stats.emplace_back(score, hap_id);
+      size_t map_entry_hap_id = map_entry.first;
+      auto score = static_cast<double>(map_entry.second);
+      stats.emplace_back(score, map_entry_hap_id);
     }
     size_t actual_k = std::min<size_t>(k, stats.size());
     // use this if we want sorted
     std::partial_sort(
-        stats.begin(), stats.begin() + actual_k, stats.end(), std::greater<std::pair<double, size_t>>());
+        stats.begin(), stats.begin() + static_cast<ptrdiff_t>(actual_k), stats.end(), std::greater<std::pair<double, size_t>>());
     // use this if we don't care about sorted
     // std::nth_element(stats.begin(), stats.begin() + actual_k, stats.end(),
     // std::greater<pair<double, size_t>>());
 
     // append to results
-    results.push_back(
-        std::make_tuple(window_start_site, window_end_site, std::vector<std::pair<size_t, double>>()));
+    results.emplace_back(window_start_site, window_end_site, std::vector<std::pair<size_t, double>>());
     for (size_t stats_idx = 0; stats_idx < actual_k; ++stats_idx) {
       std::get<2>(results[results.size() - 1])
           .emplace_back(stats[stats_idx].second, stats[stats_idx].first);

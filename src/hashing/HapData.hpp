@@ -46,8 +46,8 @@ class HapData {
 
 public:
   typedef uint64_t word_type;
-  unsigned int num_haps = 0;
-  unsigned int num_sites = 0;
+  unsigned long num_haps = 0ul;
+  unsigned long num_sites = 0ul;
   unsigned int word_size;
   HapDataMode data_mode;
   std::vector<unsigned long> physical_positions;
@@ -62,7 +62,7 @@ public:
 
   HapData(std::string mode, std::string file_root_path, unsigned int _word_size = 64,
           std::string map_file_path = "", bool fill_sites = true);
-  ~HapData();
+  ~HapData() = default;
   void add_to_hash(size_t hap_id);
   std::vector<std::tuple<size_t, size_t, std::vector<std::pair<size_t, double>>>>
   get_closest_cousins(size_t hap_id, unsigned int k, unsigned int tolerance = 0,
