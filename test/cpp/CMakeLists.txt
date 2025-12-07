@@ -18,6 +18,7 @@
 set(
         test_files
         test_file_utils.cpp
+        test_utils.cpp
 )
 
 add_executable(cpp_tests ${test_files})
