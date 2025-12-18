@@ -1,6 +1,6 @@
 # This file is part of the ARG-Needle genealogical inference and
 # analysis software suite.
-# Copyright (C) 2023 ARG-Needle Developers.
+# Copyright (C) 2023-2025 ARG-Needle Developers.
 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -43,8 +43,8 @@ set_target_properties(arg_needle_hashing PROPERTIES PUBLIC_HEADER "${arg_needle_
 target_link_libraries(arg_needle_hashing PRIVATE Boost::headers Boost::iostreams)
 target_link_libraries(arg_needle_hashing PRIVATE project_warnings)
 
-if (PYTHON_BINDINGS)
-    set_target_properties(arg_needle_hashing PROPERTIES POSITION_INDEPENDENT_CODE TRUE)
+if (ARG_NEEDLE_PYTHON_BINDINGS)
     pybind11_add_module(arg_needle_hashing_pybind hashing/pybind.cpp)
     target_link_libraries(arg_needle_hashing_pybind PRIVATE arg_needle_hashing)
+    install(TARGETS arg_needle_hashing_pybind LIBRARY DESTINATION arg_needle)
 endif ()

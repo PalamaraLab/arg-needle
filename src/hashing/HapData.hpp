@@ -1,7 +1,7 @@
 /*
   This file is part of the ARG-Needle genealogical inference and
   analysis software suite.
-  Copyright (C) 2023 ARG-Needle Developers.
+  Copyright (C) 2023-2025 ARG-Needle Developers.
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -17,25 +17,16 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef __HAP_DATA_HPP_
-#define __HAP_DATA_HPP_
+#ifndef ARG_NEELE_HAP_DATA_HPP
+#define ARG_NEELE_HAP_DATA_HPP
 
-#include <iostream>
-#include <stdint.h>
+#include <cstdint>
 #include <string>
 #include <tuple>
 #include <unordered_map>
 #include <unordered_set>
 #include <utility>
 #include <vector>
-
-using std::ostream;
-using std::pair;
-using std::string;
-using std::tuple;
-using std::unordered_map;
-using std::unordered_set;
-using std::vector;
 
 struct Window {
   size_t start, end, index; // end is inclusive
@@ -55,31 +46,31 @@ class HapData {
 
 public:
   typedef uint64_t word_type;
-  unsigned int num_haps = 0;
-  unsigned int num_sites = 0;
+  unsigned long num_haps = 0ul;
+  unsigned long num_sites = 0ul;
   unsigned int word_size;
   HapDataMode data_mode;
-  vector<unsigned long> physical_positions;
-  vector<double> genetic_positions;
-  vector<float> site_mafs;
-  vector<string> sample_names;
-  vector<vector<bool>> sites;
-  vector<vector<word_type>> words;
+  std::vector<unsigned long> physical_positions;
+  std::vector<double> genetic_positions;
+  std::vector<float> site_mafs;
+  std::vector<std::string> sample_names;
+  std::vector<std::vector<bool>> sites;
+  std::vector<std::vector<word_type>> words;
 
-  vector<unordered_map<word_type, vector<size_t>>> hashes;
-  unordered_set<size_t> hashed_hap_ids;
+  std::vector<std::unordered_map<word_type, std::vector<size_t>>> hashes;
+  std::unordered_set<size_t> hashed_hap_ids;
 
-  HapData(string mode, string file_root_path, unsigned int _word_size = 64,
-          string map_file_path = "", bool fill_sites = true);
-  ~HapData();
+  HapData(std::string mode, std::string file_root_path, unsigned int _word_size = 64,
+          std::string map_file_path = "", bool fill_sites = true);
+  ~HapData() = default;
   void add_to_hash(size_t hap_id);
-  vector<tuple<size_t, size_t, vector<pair<size_t, double>>>>
+  std::vector<std::tuple<size_t, size_t, std::vector<std::pair<size_t, double>>>>
   get_closest_cousins(size_t hap_id, unsigned int k, unsigned int tolerance = 0,
                       double window_size_genetic = 0);
   void print_hap(size_t hap_id);
   void print_hashes();
   void print_word_match_diagram(size_t hap_id1, size_t hap_id2);
-  friend ostream& operator<<(ostream& os, const HapData& data);
+  friend std::ostream& operator<<(std::ostream& os, const HapData& data);
 };
 
-#endif // __HAP_DATA_HPP_
+#endif // ARG_NEELE_HAP_DATA_HPP

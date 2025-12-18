@@ -1,7 +1,7 @@
 /*
   This file is part of the ARG-Needle genealogical inference and
   analysis software suite.
-  Copyright (C) 2023 ARG-Needle Developers.
+  Copyright (C) 2023-2025 ARG-Needle Developers.
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -25,39 +25,108 @@
 // The license file can be found at 3rd_party/Eagle/COPYING from the
 // root of this repository.
 
-#ifndef FILEUTILS_HPP
-#define FILEUTILS_HPP
+#ifndef ARG_NEEDLE_FILE_UTILS_HPP
+#define ARG_NEEDLE_FILE_UTILS_HPP
 
-#include <fstream>
+#include <filesystem>
+#include <memory>
 #include <string>
-#include <vector>
-
-#include <boost/iostreams/filtering_stream.hpp>
 
 namespace FileUtils {
+    /**
+     * @brief Check whether a given file exists on disk.
+     *
+     * @param file Path to the file to check.
+     * @return true if the file exists, false otherwise.
+     */
+    bool fileExists(const std::filesystem::path &file);
 
-bool fileExists(const std::string& name);
+    /**
+     * @class AutoGzIfstream
+     * @brief Stream wrapper that transparently reads either plain-text or gzip-compressed files.
+     *
+     * AutoGzIfstream detects whether an input file is compressed (.gz) and automatically
+     * opens it appropriately. It behaves similarly to std::ifstream but supports reading
+     * gzip-compressed streams without requiring explicit decompression by the caller.
+     *
+     * Internally uses a pimpl to hide implementation details and avoid exposing boost
+     * libraries at the interface level.
+     */
+    class AutoGzIfstream {
+        struct Impl;
+        std::unique_ptr<Impl> pimpl;
 
-class AutoGzIfstream {
-  boost::iostreams::filtering_istream boost_in;
-  std::ifstream fin;
+    public:
+        /**
+         * @brief Construct an unopened AutoGzIfstream.
+         */
+        AutoGzIfstream();
 
-public:
-  static int lineCount(const std::string& file);
+        /**
+         * @brief Destructor closes the stream if open and releases internal resources.
+         */
+        ~AutoGzIfstream() noexcept;
 
-  void openOrExit(const std::string& file, std::ios_base::openmode mode = std::ios::in);
-  void close();
-  template <class T> AutoGzIfstream& operator>>(T& x) {
-    boost_in >> x;
-    return *this;
-  }
+        /**
+         * @brief Count the number of lines in a file (supports gzipped and plain files).
+         *
+         * @param file Path to the file whose line count will be computed.
+         * @return Number of lines in the file.
+         */
+        [[nodiscard]] static int lineCount(const std::filesystem::path &file);
 
-  operator bool() const;
-  friend AutoGzIfstream& getline(AutoGzIfstream& in, std::string& s);
-};
+        /**
+         * @brief Open a file for reading or exit the program if opening fails.
+         *
+         * Automatically detects gzip compression based on file contents.
+         *
+         * @param file Path to the file to open.
+         * @param mode Stream opening mode (defaults to std::ios::in).
+         */
+        void openOrExit(const std::filesystem::path &file,
+                        std::ios_base::openmode mode = std::ios::in);
 
-AutoGzIfstream& getline(AutoGzIfstream& in, std::string& s);
+        /**
+         * @brief Close the underlying stream.
+         */
+        void close();
 
+        /**
+         * @brief Read whitespace-delimited input into a string via the extraction operator.
+         *
+         * @param x Output string that will receive the parsed token.
+         * @return Reference to this stream.
+         */
+        AutoGzIfstream &operator>>(std::string &x);
+
+        /**
+         * @brief Boolean conversion indicating whether the stream is currently valid.
+         *
+         * Allows usage in conditions such as:
+         * @code
+         * if (stream) { ... }
+         * @endcode
+         *
+         * @return true if the stream is open and in a good state, false otherwise.
+         */
+        [[nodiscard]] explicit operator bool() const noexcept;
+
+        /**
+         * @brief Friend declaration enabling getline(AutoGzIfstream&, ...).
+         */
+        friend AutoGzIfstream &getline(AutoGzIfstream &in, std::string &s);
+    };
+
+    /**
+     * @brief Read a full line from an AutoGzIfstream into a string.
+     *
+     * Supports both compressed and uncompressed input sources.
+     *
+     * @param in Stream to read from.
+     * @param s Output string receiving the line (without delimiter).
+     * @return Reference to the stream.
+     */
+    AutoGzIfstream &getline(AutoGzIfstream &in, std::string &s);
 } // namespace FileUtils
 
-#endif
+#endif // ARG_NEEDLE_FILE_UTILS_HPP

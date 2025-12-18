@@ -1,7 +1,7 @@
 /*
   This file is part of the ARG-Needle genealogical inference and
   analysis software suite.
-  Copyright (C) 2023 ARG-Needle Developers.
+  Copyright (C) 2023-2025 ARG-Needle Developers.
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -17,14 +17,15 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef __UTILS_HPP_
-#define __UTILS_HPP_
+#ifndef ARG_NEEDLE_UTILS_HPP
+#define ARG_NEEDLE_UTILS_HPP
 
 #include <string>
 
-using std::string;
+inline std::string make_error(const std::string &msg, const char *file, const int line) noexcept {
+    return std::string(file) + ":" + std::to_string(line) + ": " + msg;
+}
 
-// Utility for exceptions
-#define THROW_LINE(a) (string(__FILE__) + ":" + std::to_string(__LINE__) + ": " + a)
+#define MAKE_ERROR(msg) (make_error((msg), __FILE__, __LINE__))
 
-#endif // __UTILS_HPP_
+#endif // ARG_NEEDLE_UTILS_HPP

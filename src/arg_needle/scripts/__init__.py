@@ -14,12 +14,3 @@
 
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-from arg_needle import (
-    build_arg_simulation, build_arg, extend_arg,
-    add_default_arg_building_arguments, normalize_arg, trim_arg
-)
-
-def test_import():
-    assert True
-    print("Successfully imported all arg_needle components")

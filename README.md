@@ -20,7 +20,7 @@ Please see the [ARG-Needle manual](https://palamaralab.github.io/software/argnee
 
 ## For developers: making a release
 
-- Bump the version number in [setup.py](setup.py) and [CMakeLists.txt](CMakeLists.txt)
+- Bump the version number in [pyproject.toml](pyproject.toml) and [CMakeLists.txt](CMakeLists.txt)
 - Update [RELEASE_NOTES.md](RELEASE_NOTES.md)
 - Push changes and check that all [GitHub workflows](https://github.com/PalamaraLab/arg_needle/actions) pass
 - Tag the commit in Git using syntax `vX.Y.Z`

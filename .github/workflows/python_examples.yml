@@ -1,0 +1,77 @@
+name: Python examples
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - '**'
+  workflow_dispatch:
+
+jobs:
+
+  build-and-test:
+    name: Python examples
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 10
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-24.04
+            py: "3.10"
+            sys_install: "sudo apt -y update && sudo apt -y install libboost-iostreams-dev"
+          - os: macos-15
+            py: "3.13"
+            sys_install: "brew install boost"
+
+    steps:
+      - name: checkout repo & submodules
+        uses: actions/checkout@v5
+        with:
+          submodules: true
+          fetch-depth: 0
+
+      - name: install deps
+        run: |
+          ${{ matrix.sys_install }}
+
+      - name: Set up Python ${{ matrix.py }}
+        uses: actions/setup-python@v6
+        with:
+          python-version: ${{ matrix.py }}
+
+      - name: install python bindings
+        run: |
+          python -m pip install --upgrade pip setuptools wheel
+          python -m pip install .
+
+      - name: prepare example
+        run: |
+          prepare_example
+
+      - name: regular ARG-Needle
+        run: |
+          infer_args
+
+      - name: ARG-Needle with ASMC-clust
+        run: |
+          infer_args --asmc_clust 1
+
+      - name: ARG-Needle without ARG normalization
+        run: |
+          infer_args --normalize 0
+
+      - name: ARG-Needle (sequence mode)
+        run: |
+          prepare_example --mode sequence --length 5e5
+          infer_args --mode sequence
+
+      - name: ARG-Needle advanced mode (multistep)
+        run: |
+          prepare_example
+          infer_args_advanced --step 1 --num_snp_samples 200
+          infer_args_advanced --step 2
+          infer_args_advanced --step 3 --trim_num_snps 0,50
