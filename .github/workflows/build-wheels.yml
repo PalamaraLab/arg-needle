@@ -80,6 +80,8 @@ jobs:
     name: Upload to PyPI
     needs: [build_wheels_cloud]
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write
     if: ${{ github.event_name == 'release' && github.event.action == 'published' }}
 
     steps:
@@ -92,6 +94,4 @@ jobs:
 
       - uses: pypa/gh-action-pypi-publish@v1.13.0
         with:
-          user: __token__
-          password: ${{ secrets.PYPI_TOKEN }}
           packages_dir: wheels/
